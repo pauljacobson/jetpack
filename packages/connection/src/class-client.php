@@ -372,8 +372,19 @@ class Client {
 
 		// Allow use a store sandbox. Internal ref: PCYsg-IA-p2.
 		if ( isset( $_COOKIE ) && isset( $_COOKIE['store_sandbox'] ) ) {
-			$secret                    = $_COOKIE['store_sandbox'];
-			$args['headers']['Cookie'] = "store_sandbox=$secret;";
+			$secret = $_COOKIE['store_sandbox'];
+
+			if ( ! array_key_exists( 'headers', $args ) ) {
+				$args['headers'] = array();
+			}
+
+			if ( array_key_exists( 'Cookie', $args['headers'] ) ) {
+				$args['headers']['Cookie'] .= ' ';
+			} else {
+				$args['headers']['Cookie'] = '';
+			}
+
+			$args['headers']['Cookie'] .= "store_sandbox=$secret;";
 		}
 
 		$filtered_args = array_intersect_key(
