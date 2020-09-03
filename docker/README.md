@@ -20,7 +20,7 @@ _**All commands mentioned in this document should be run from the base Jetpack d
 
 * [Docker](https://hub.docker.com/search/?type=edition&offering=community)
 * [NodeJS](https://nodejs.org)
-* [Yarn](https://yarnpkg.com/) — please make sure your version is higher than v1.3: `yarn --version`
+* [Yarn](https://yarnpkg.com/) — please make sure your version is higher than what is noted in the [development environment documentation](../docs/development-environment.md#minimum-required-versions): `yarn --version`
 * Optionally [Ngrok](https://ngrok.com) client and account or some other service for creating a local HTTP tunnel. It’s fine to stay on the free pricing tier with Ngrok.
 
 Install prerequisites; you will need to open up Docker to install its dependencies.
@@ -160,6 +160,16 @@ yarn docker:phpunit:package
 For a specific package's tests
 ```sh
 yarn docker:phpunit:package autoloader
+```
+
+If you need to clear out a particular package's composer.lock
+```sh
+yarn docker:phpunit:package autoloader -c
+```
+
+To run all package unit tests and clear all composer.lock files within
+```sh
+yarn docker:phpunit:package -c
 ```
 
 ### Starting over

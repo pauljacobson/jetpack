@@ -7,6 +7,11 @@
 
 namespace Automattic\Jetpack;
 
+/*
+ * The Config package does not require the composer packages that
+ * contain the package classes shown below. The consumer plugin
+ * must require the corresponding packages to use these features.
+ */
 use Automattic\Jetpack\Connection\Manager;
 use Automattic\Jetpack\JITMS\JITM as JITMS_JITM;
 use Automattic\Jetpack\JITM as JITM;
@@ -170,16 +175,21 @@ class Config {
 	}
 
 	/**
-	 * Enables the tracking feature. Depends on the Terms of Service package, so enables it too.
+	 * Enables the tracking feature.
+	 * Depends on the Terms of Service package and the Connection package,
+	 * so enables them too.
 	 */
 	protected function enable_tracking() {
 
 		// Enabling dependencies.
 		$this->ensure_feature( 'tos' );
+		$this->ensure_feature( 'connection' );
 
 		$terms_of_service = new Terms_Of_Service();
-		$tracking         = new Plugin_Tracking();
-		if ( $terms_of_service->has_agreed() ) {
+		$connection       = new Manager();
+		$tracking         = new Plugin_Tracking( $connection );
+
+		if ( $terms_of_service->has_agreed() && $connection->is_user_connected() ) {
 			add_action( 'init', array( $tracking, 'init' ) );
 		} else {
 			/**
