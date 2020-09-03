@@ -70,7 +70,7 @@ class SearchApp extends Component {
 		window.addEventListener( 'popstate', this.onPopstate );
 		window.addEventListener( 'queryStringChange', this.onChangeQueryString );
 
-		this.updateEventListeners( this.state.overlayOptions.overlayTrigger );
+		this.updateEventListeners();
 		document.querySelectorAll( this.props.themeOptions.filterInputSelector ).forEach( element => {
 			element.addEventListener( 'click', this.handleFilterInputClick );
 		} );
@@ -83,7 +83,6 @@ class SearchApp extends Component {
 		document.querySelectorAll( this.props.themeOptions.searchInputSelector ).forEach( input => {
 			input.form.removeEventListener( 'submit', this.handleSubmit );
 			input.removeEventListener( 'input', this.handleInput );
-			input.removeEventListener( 'focus', this.handleInputFocus );
 		} );
 
 		document.querySelectorAll( this.props.themeOptions.filterInputSelector ).forEach( element => {
@@ -91,22 +90,11 @@ class SearchApp extends Component {
 		} );
 	}
 
-	updateEventListeners( type ) {
+	updateEventListeners() {
 		document.querySelectorAll( this.props.themeOptions.searchInputSelector ).forEach( input => {
-			if ( type === 'results' ) {
-				// Remove focus event listener
-				input.removeEventListener( 'focus', this.handleInputFocus );
-				// Add listeners for input and submit
-				input.form.addEventListener( 'submit', this.handleSubmit );
-				input.addEventListener( 'input', this.handleInput );
-			}
-			if ( type === 'immediate' ) {
-				// Remove listeners for input and submit
-				input.form.removeEventListener( 'submit', this.handleSubmit );
-				input.removeEventListener( 'input', this.handleInput );
-				// Add focus event listener
-				input.addEventListener( 'focus', this.handleInputFocus );
-			}
+			// Add listeners for input and submit
+			input.form.addEventListener( 'submit', this.handleSubmit );
+			input.addEventListener( 'input', this.handleInput );
 		} );
 	}
 
@@ -138,10 +126,13 @@ class SearchApp extends Component {
 		if ( event.inputType.includes( 'delete' ) || event.inputType.includes( 'format' ) ) {
 			return;
 		}
+
+		if ( this.state.overlayOptions.overlayTrigger === 'immediate' ) {
+			this.showResults();
+		}
+
 		setSearchQuery( event.target.value );
 	}, 200 );
-
-	handleInputFocus = () => this.showResults();
 
 	handleFilterInputClick = event => {
 		event.preventDefault();
@@ -160,7 +151,7 @@ class SearchApp extends Component {
 		this.setState(
 			state => ( { overlayOptions: { ...state.overlayOptions, ...newOverlayOptions } } ),
 			() => {
-				this.updateEventListeners( this.state.overlayOptions.overlayTrigger );
+				this.updateEventListeners();
 				this.showResults();
 			}
 		);
@@ -170,6 +161,7 @@ class SearchApp extends Component {
 		this.setState( { showResults: true } );
 		this.preventBodyScroll();
 	};
+
 	hideResults = () => {
 		this.restoreBodyScroll();
 		restorePreviousHref( this.props.initialHref, () => {
