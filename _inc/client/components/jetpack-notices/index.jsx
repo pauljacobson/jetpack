@@ -27,6 +27,7 @@ import {
 	userIsSubscriber,
 	getConnectionErrors,
 } from 'state/initial-state';
+import { getLicensingError, clearLicensingError } from 'state/licensing';
 import { getSiteDataErrors } from 'state/site';
 import { JETPACK_CONTACT_BETA_SUPPORT } from 'constants/urls';
 import JetpackStateNotices from './state-notices';
@@ -251,23 +252,41 @@ class JetpackNotices extends React.Component {
 						) }
 					/>
 				) }
+				{ this.props.licensingError && (
+					<SimpleNotice
+						showDismiss={ true }
+						status="is-error"
+						text={ this.props.licensingError }
+						onDismissClick={ this.props.clearLicensingError }
+					/>
+				) }
 			</div>
 		);
 	}
 }
 
-export default connect( state => {
-	return {
-		connectUrl: _getConnectUrl( state ),
-		siteConnectionStatus: getSiteConnectionStatus( state ),
-		userCanConnectSite: userCanConnectSite( state ),
-		userIsSubscriber: userIsSubscriber( state ),
-		isLinked: isCurrentUserLinked( state ),
-		isDevVersion: isDevVersion( state ),
-		siteOfflineMode: getSiteOfflineMode( state ),
-		isStaging: isStaging( state ),
-		isInIdentityCrisis: isInIdentityCrisis( state ),
-		connectionErrors: getConnectionErrors( state ),
-		siteDataErrors: getSiteDataErrors( state ),
-	};
-} )( JetpackNotices );
+export default connect(
+	state => {
+		return {
+			connectUrl: _getConnectUrl( state ),
+			siteConnectionStatus: getSiteConnectionStatus( state ),
+			userCanConnectSite: userCanConnectSite( state ),
+			userIsSubscriber: userIsSubscriber( state ),
+			isLinked: isCurrentUserLinked( state ),
+			isDevVersion: isDevVersion( state ),
+			siteOfflineMode: getSiteOfflineMode( state ),
+			isStaging: isStaging( state ),
+			isInIdentityCrisis: isInIdentityCrisis( state ),
+			connectionErrors: getConnectionErrors( state ),
+			siteDataErrors: getSiteDataErrors( state ),
+			licensingError: getLicensingError( state ),
+		};
+	},
+	dispatch => {
+		return {
+			clearLicensingError: () => {
+				return dispatch( clearLicensingError() );
+			},
+		};
+	}
+)( JetpackNotices );
